@@ -51,6 +51,8 @@ def get_content(date):
 	return (None, None)
 
 def save_content(date, data):
+	if data == '':
+		return
 	d = os.path.dirname(get_filename(date))
 	if not os.path.exists(d):
 		os.makedirs(d)
