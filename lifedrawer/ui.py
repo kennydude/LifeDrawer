@@ -2,8 +2,8 @@
 LifeDrawer UI for GTK
 '''
 
-from gi.repository import Gtk, Pango
-import datetime
+from gi.repository import Gtk, Pango, GObject
+import datetime, threading
 from lifedrawer import utils, backend
 
 class MainWindow(object):
@@ -15,6 +15,7 @@ class MainWindow(object):
 	}
 	
 	def __init__(self):
+		self.t = None
 		self.date = datetime.date.today()
 		
 		self.builder = Gtk.Builder()
@@ -83,10 +84,17 @@ class MainWindow(object):
 		self.date = self.date.replace(year, month + 1, day)
 		self.updateDate()
 		self.loadContent()
-
+	
 	def saveContent(self):
+		if self.t is not None:
+			GObject.source_remove(self.t)
+		# We save 1second after we stop typing to reduce Disk IO
+		self.t = GObject.timeout_add(1000 * 1, self.real_saveContent)
+
+	def real_saveContent(self):
 		' define stuff and then convert to bare HTML '
 		tags = []
+		utils.debug("Saving content....")
 		
 		for (html, tag) in self.html_table.iteritems():
 			tags.append( ( self.textBuffer.get_tag_table().lookup(tag), html ) )
