@@ -3,7 +3,7 @@ LifeDrawer UI for GTK
 '''
 
 from gi.repository import Gtk, Pango, GObject
-import datetime, threading
+import datetime, threading, shutil, os
 from lifedrawer import utils, backend
 
 class MainWindow(object):
@@ -19,7 +19,7 @@ class MainWindow(object):
 		self.date = datetime.date.today()
 		
 		self.builder = Gtk.Builder()
-		self.uifile = "lifedrawer/main-window.ui"
+		self.uifile = "lifedrawer/main-window.xml"
 		self.builder.add_from_file(self.uifile)
 		self.window = self.builder.get_object ("MainWindow")
 		self.window.connect ("destroy", Gtk.main_quit)
@@ -71,6 +71,12 @@ class MainWindow(object):
 		self.quoteButton.set_label("Quote")
 		self.quoteButton.connect("toggled", self.setTag, "blockquote")
 		self.toolbar.insert(self.quoteButton, 3)
+	
+		self.insertImage = Gtk.ToolButton()
+		self.insertImage.set_icon_name("add")
+		self.insertImage.set_label("Add Image")
+		self.insertImage.connect("clicked", self.clickInsertImage)
+		self.toolbar.insert(self.insertImage, 4)
 		
 		self.updateDate()		
 	
@@ -103,14 +109,15 @@ class MainWindow(object):
 		end = self.textBuffer.get_end_iter().get_offset()
 		for i in range(0, end):
 			it = self.textBuffer.get_iter_at_offset(i)
-
-			for (tag, html) in tags:
-				if it.begins_tag(tag):
-					content += '<%s>' % html
-				elif it.ends_tag(tag):
-					content += '</%s>' % html
-			
-			content += it.get_char()
+			if it.get_pixbuf() != None:
+				content += "<img src='%s' />" % it.get_pixbuf().get_data("url")
+			else:
+				for (tag, html) in tags:
+					if it.begins_tag(tag):
+						content += '<%s>' % html
+					elif it.ends_tag(tag):
+						content += '</%s>' % html
+				content += it.get_char()
 		
 		backend.save_content(self.date, content)
 
@@ -141,6 +148,44 @@ class MainWindow(object):
 		self.underlineButton.set_active("underline" in bag)
 		self.quoteButton.set_active("quote" in bag)
 		self.saveContent()
+
+	def clickInsertImage(self, widget, data=None):
+		dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
+            Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+		filter_text = Gtk.FileFilter()
+		filter_text.set_name("Images")
+		filter_text.add_mime_type("image/*")
+		dialog.add_filter(filter_text)
+		
+		response = dialog.run()
+		if response == Gtk.ResponseType.OK:
+			print "Adding File... ", dialog.get_filename()
+			fname = dialog.get_filename().split('/')[-1]
+			fname = os.path.join(backend.get_attachment_path(self.date), "%s_%s" %(self.date.day, fname) )
+			
+			while os.path.exists(fname):
+				fname = fname.rsplit('.', 2)[-2] + "_" + fname.rsplit('.', 2)[-1]
+
+			if not os.path.exists(os.path.join(*fname.split('/')[:-1])):
+				os.makedirs(os.path.join(*fname.split('/')[:-1]))
+			shutil.copy(dialog.get_filename(), fname)
+			try:
+				from gi.repository import GdkPixbuf
+				p = GdkPixbuf.Pixbuf.new_from_file(fname)
+				iters = self.textBuffer.get_selection_bounds()
+				print iters
+				if iters != None and len(iters) == 2:
+					iters = iters[0]
+				else:
+					iters = self.textBuffer.get_iter_at_offset(0)
+				p.set_data("url", fname)
+				self.textBuffer.insert_pixbuf(iters, p)
+			except Exception as ex:
+				print "TODO: Exception box", repr(ex)
+		dialog.destroy()
 
 	def setTag(self, widget, data=None):
 		'''

@@ -5,6 +5,9 @@ import os, os.path
 from lifedrawer import utils, config
 import xml.parsers.expat
 
+def get_attachment_path(date):
+	return os.path.join(config.drawer, str(date.year), str(date.month))
+
 def get_filename(date):
 	return os.path.join(config.drawer, str(date.year), str(date.month), str(date.day) + ".html")
 

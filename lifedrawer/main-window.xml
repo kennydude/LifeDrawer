@@ -13,36 +13,68 @@
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <child>
-          <object class="GtkBox" id="leftBox">
+          <object class="GtkBox" id="leftMostBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkLabel" id="dateLabel">
+              <object class="GtkToolbar" id="leftToolBar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="ypad">1</property>
-                <property name="label">DATE</property>
-                <property name="justify">center</property>
+                <property name="toolbar_style">both-horiz</property>
+	         	<style>
+					<class name="primary-toolbar" />
+				</style>
+                <child>
+                  <object class="GtkToolItem" id="bgo">
+                    <property name="can_focus">False</property>
+                    <property name="use_action_appearance">False</property>
+                    <child>
+                      <object class="GtkBox" id="leftBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkLabel" id="dateLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="ypad">1</property>
+                            <property name="label">DATE</property>
+                            <property name="justify">center</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">20</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="separator">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="padding">20</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="padding">20</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="padding">20</property>
-                <property name="position">1</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -56,7 +88,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>
@@ -75,6 +107,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="toolbar_style">both-horiz</property>
+    			<style>
+					<class name="primary-toolbar" />
+				</style>
               </object>
               <packing>
                 <property name="expand">False</property>
