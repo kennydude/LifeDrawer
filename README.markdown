@@ -27,5 +27,4 @@ TODO
 * Hopefully get that black feel on Ubuntu instead of it looking a bit odd
 * Add an App Icon
 * Add some GUI configuration to the app
-* Allow attachments! :D
 * Go ANDROID! (for the future of course) :D

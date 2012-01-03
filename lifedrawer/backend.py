@@ -27,6 +27,13 @@ class DocParser(object):
 				"name" : name,
 				"starts" : self.i
 			}
+		elif name == "img":
+			print "Reading tag"
+			self.tags.append({
+				"name" : "img",
+				"src" : attrs['src'],
+				"starts" : self.i
+			})
 	def end_element(self, name):
 		if name in self.bag:
 			self.cur_tag['ends'] = self.i

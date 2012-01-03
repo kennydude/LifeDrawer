@@ -126,9 +126,19 @@ class MainWindow(object):
 		if content != None:
 			self.textBuffer.set_text(content)
 			for tag in tags:
-				s = self.textBuffer.get_iter_at_offset(tag['starts'])
-				e = self.textBuffer.get_iter_at_offset(tag['ends'])
-				self.textBuffer.apply_tag_by_name(self.html_table[tag['name']], s, e)
+				if tag['name'] == "img":
+					try:
+						from gi.repository import GdkPixbuf
+						p = GdkPixbuf.Pixbuf.new_from_file(os.path.join(backend.get_attachment_path(self.date), tag['src'] ))
+						p.set_data("url", tag['src'])
+						iters = self.textBuffer.get_iter_at_offset(tag['starts'])
+						self.textBuffer.insert_pixbuf(iters, p)
+					except Exception as ex:
+						print repr(ex), tag['src']
+				else:
+					s = self.textBuffer.get_iter_at_offset(tag['starts'])
+					e = self.textBuffer.get_iter_at_offset(tag['ends'])
+					self.textBuffer.apply_tag_by_name(self.html_table[tag['name']], s, e)
 		else:
 			self.textBuffer.set_text('')
 
@@ -180,9 +190,11 @@ class MainWindow(object):
 				if iters != None and len(iters) == 2:
 					iters = iters[0]
 				else:
-					iters = self.textBuffer.get_iter_at_offset(0)
+					iters = self.textBuffer.get_iter_at_offset(self.textBuffer.get_property("cursor-position"))
+				fname = fname.split('/')[-1]
 				p.set_data("url", fname)
 				self.textBuffer.insert_pixbuf(iters, p)
+				self.saveContent()
 			except Exception as ex:
 				print "TODO: Exception box", repr(ex)
 		dialog.destroy()
